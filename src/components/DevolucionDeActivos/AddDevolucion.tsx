@@ -288,7 +288,7 @@ const SidebarAddDesignar = (props: SidebarDevolutionAssetProps) => {
           'Content-Type': 'application/json'
         }
       })
-       setGroupState(response.data)
+       setGroupState(response.data.State)
     } catch (error) {
       console.error(error)
     }

@@ -13,10 +13,6 @@ import {
   TooltipProps,
   styled,
   tooltipClasses,
-  Typography,
-  IconButton,
-  useTheme,
-  Grid,
   DialogContent,
   DialogContentText,
   DialogTitle,
@@ -26,6 +22,9 @@ import {
   tableCellClasses,
   TablePagination,
   CircularProgress,
+  DialogActions,
+  InputAdornment,
+  TextField,
 } from '@mui/material'
 
 import SidebarEditEntrega from '../../components/EntregaDeActivos/editentrega';
@@ -34,6 +33,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import { useAsset } from 'src/context/DevolutionContext'
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'; // Icono de PDF
 import SidebarEditDevolution from 'src/components/DevolucionDeActivos/editDevolution';
+import FilterListIcon from '@mui/icons-material/FilterList';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -75,12 +75,6 @@ interface state {
 
 }
 
-interface codigoQR{
-  _id: string,
-  qrCodeDataUrl: string
-}
-
-
 const Transition = forwardRef(function Transition(
   props: SlideProps & { children?: ReactElement<any, any> },
   ref: Ref<unknown>
@@ -92,56 +86,40 @@ const AssetList: React.FC = () => {
   const [open, setOpen] = React.useState(false);
   const { settings } = useSettings()
   const { mode } = settings
-  const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const handleClickOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
-
-  //abir QR
+  //const handleClose = () => setOpen(false)
+  const [deleteAssetId, setDeleteAssetId] = useState<string | null>(null);
   const[res,setRes]=useState<string>("")
-  const [openQR, setOpenQR] = useState(false);
-      const handleClickOpenQR = () => {
-        setOpenQR(true);
-      };
 
-      const handleCloseQR = () => {
-        setOpenQR(false);
-      };
-
-    //   const generateQR = async (id:string)=>{
-    //     GenerateQR(id)
-    //   }
-
-    //   const GenerateQR =async (id: string) => {
-
-    //     try {
-    //       const res = await axios.get<codigoQR>(`${process.env.NEXT_PUBLIC_API_ACTIVOS}delivery/get-asset-generate-QR/${id}`);
-    //       console.log(res.data.qrCodeDataUrl,'aaaaaaaaaaaaaaaaaaaaaa')
-    //       setRes(res.data.qrCodeDataUrl)
-    //       handleClickOpenQR()
-    //       // Otra opción es mostrar un indicador de carga mientras se procesa
-
-    // // 3. Mostrar la imagen en una etiqueta <img>
-
-    //     } catch (error:any) {
-    //       alert(error.response?.data.message);
-    //       setRes("no Qr")
-    //       handleClickOpenQR()
-
-    //     }
-    //   };
 //LLAMANDO AL CONTEXTO
 
   let { assets,setlocation //,setValue
-  ,setLimit,limit,deleteAsset,generatenewPdf,totalAssets,page,setPage
+  ,settransmitterId,setreceiverId,setLimit,limit,deleteAsset,generatenewPdf,totalAssets,page,setPage
   } = useAsset();
 
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState<boolean>(false)
-  const [userIdToDelete, setUserIdToDelete] = useState<string>('')
   const [isSidebarEditOpen, setIsSidebarEditOpen] = useState(false);
-  const handleDelete = async (id: string) => {
-    // const assetIds = [...new Set([id, ...selectedRows])].flat();
-    setUserIdToDelete(id)
-  }
+  const handleClose = () => {
+    setOpen(false);
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleDeleteCancelled = () => {
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleDelete = (assetId: string) => {
+    setDeleteAssetId(assetId);
+    setIsDeleteConfirmationOpen(true);
+  };
+  const handleDeleteConfirmed = async () => {
+    if (deleteAssetId) {
+      await deleteAsset(deleteAssetId);
+      handleClose();
+      setDeleteAssetId(null);
+    }
+  };
+
  const generatePdf = async (id:string)=>{
     generatenewPdf(id)
 
@@ -201,8 +179,16 @@ const AssetList: React.FC = () => {
  //FILTRO PARA UBICACION
 const FilterUbicacion=((e:ChangeEvent<HTMLInputElement>)=>{
   setlocation(e.target.value);
-
 })
+ //FILTRO PARA PERSONAL QUE ENTREGO
+ const FilterPeronalEntrega=((e:ChangeEvent<HTMLInputElement>)=>{
+  settransmitterId(e.target.value);
+})
+//FILTRO PARA PERSONAL QUE RECIBIO
+const FilterPersonalRecibido=((e:ChangeEvent<HTMLInputElement>)=>{
+  setreceiverId(e.target.value);
+})
+
 //IMPRIMIR EL QR
 const handlePrint = () => {
   const printWindow = window.open('', '', 'width=600,height=600');
@@ -272,6 +258,68 @@ const handlePrint = () => {
                 <TableCell style={{fontFamily: 'Roboto, Arial, sans-serif', fontSize: '13px',color:'white'}}>Actas </TableCell>
             </TableRow>
           </TableHead>
+
+{/* //FILTROS */}
+<TableHead  style={headersty}>
+            <TableRow sx={{ '& .MuiTableCell-root': { py: (theme: { spacing: (arg0: number) => any; }) => `${theme.spacing(2.9)} !important` } }}>
+                <TableCell> </TableCell>
+                <TableCell > </TableCell>
+
+                <TableCell >
+                <TextField
+                       variant="standard"
+                        onChange={FilterPeronalEntrega}
+                        sx={{ flex: 2, borderRadius: '10px' }}
+                        autoComplete='off'
+
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <FilterListIcon />
+                            </InputAdornment>
+                          ),
+                          style: { fontSize: '14.5px', color: 'grey'  }
+                        }}
+                      />
+                </TableCell>
+                <TableCell >
+                <TextField
+                       variant="standard"
+                        onChange={FilterPersonalRecibido}
+                        sx={{ flex: 2, borderRadius: '10px' }}
+                        autoComplete='off'
+
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <FilterListIcon />
+                            </InputAdornment>
+                          ),
+                          style: { fontSize: '14.5px', color: 'grey'  }
+                        }}
+                      /> </TableCell>
+                <TableCell >
+                      <TextField
+                       variant="standard"
+                        onChange={FilterUbicacion}
+                        sx={{ flex: 2, borderRadius: '10px' }}
+                        autoComplete='off'
+
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <FilterListIcon />
+                            </InputAdornment>
+                          ),
+                          style: { fontSize: '14.5px', color: 'grey'  }
+                        }}
+                      />
+                </TableCell>
+                <TableCell> </TableCell>
+                <TableCell > </TableCell>
+            </TableRow>
+          </TableHead>
+ {/* MAPEO DE LOS DATOS */}
            { Array.isArray(assets) && assets.length > 0 ? (
             assets.map(asset => (
           <TableBody key={asset._id}>
@@ -299,64 +347,6 @@ const handlePrint = () => {
                           >Generar PDF
                           </Button>
                       </li>
-                      {/* <li style={{ marginTop: '10px' }}>
-                          <Button size='small' variant='contained'
-                            style={{
-                              color: '#fff', // Cambia el color del texto
-                              borderRadius: '8px', // Agrega bordes redondeados
-                              width: '140px',
-                              height: '24px', // Ajusta la altura
-                              fontSize: '12px', // Cambia el tamaño del texto
-                            }}
-                            onClick={() => generateQR(asset._id)}
-                          > Generar QR
-                          </Button>
-                      <Dialog onClose={handleCloseQR} aria-labelledby='customized-dialog-title' open={openQR}>
-                          <DialogTitle id='customized-dialog-title' sx={{ p: 4 }} style={{ textAlign: 'center' }}>
-                            <Typography variant='h6' component='span'>
-                              Codigo QR
-                            </Typography>
-                            <Typography>INFORMACION DEL ACTIVO</Typography>
-                            <IconButton
-                              aria-label='close'
-                              onClick={() => setOpenQR(false)}
-                              sx={{ top: 10, right: 10, position: 'absolute', color: 'grey.500' }}
-                            >
-                              <Icon icon='mdi:close' />
-                            </IconButton>
-                          </DialogTitle>
-                          <DialogContent dividers sx={{ p: 4, textAlign: 'center' }}>
-
-                          {asset.asset.map((asset, index) => (
-                            <div key={index}>
-                              {asset.code}
-                            </div>
-                          ))}
-
-                            <img
-                              src={res}
-                              alt="Código QR"
-                              style={{
-                                cursor: 'pointer',
-                                maxWidth: '500px',
-                                maxHeight: '500px',
-                                textAlign: 'center',
-                                marginBottom: '9px',
-                              }}
-                              onClick={handleClickOpenQR}
-                            />
-                            <br />
-                            <Grid container spacing={2}>
-                              <Grid item xs={6}>
-                              <Button style={{ width: '9rem' }} size='small' type='submit' variant='contained' onClick={()=>handleCloseQR()}>Aceptar</Button>
-                              </Grid>
-                              <Grid item xs={6}>
-                              <Button style={{ width: '9rem' }} size='small' variant='contained' onClick={handlePrint}>Imprimir</Button>
-                              </Grid>
-                            </Grid>
-                          </DialogContent>
-                        </Dialog>
-                    </li> */}
                   </ul>
 
                 </TableCell>
@@ -436,12 +426,26 @@ const handlePrint = () => {
               </TableCell>
             </TableRow>
           </TableBody>
-          )
-
-          }
+          )}
+          <Dialog open={isDeleteConfirmationOpen} onClose={handleClose}>
+                  <DialogTitle>Confirmar eliminación</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      ¿Estás seguro que deseas eliminar esta devolucion?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleDeleteCancelled} color="primary">
+                      Cancelar
+                    </Button>
+                    <Button onClick={handleDeleteConfirmed} color="primary">
+                      Eliminar
+                    </Button>
+                  </DialogActions>
+                </Dialog>
         </Table>
       </TableContainer>
-      {/* <TablePagination
+      <TablePagination
           component="div"
           count={totalAssets}
           page={parseInt(page)} // Asegúrate de que page sea un número
@@ -449,11 +453,10 @@ const handlePrint = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Filas por página"
           rowsPerPageOptions={[1, 5, 10, 100]}
-
             onPageChange={(event: any, newPage: string) => {
               setPage(parseInt(newPage)); // Asegúrate de que newPage sea un número
             }}
-        /> */}
+        />
     </>
   )
  }

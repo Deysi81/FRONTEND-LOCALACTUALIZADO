@@ -85,12 +85,36 @@ const UserDropdown = (props: Props) => {
 
   return (
     <Fragment>
-      <Typography style={{  color: 'gray',fontSize:'15px',fontWeight: 'bold'}}>
+     <Box marginBottom={-2}>
+    <Box marginBottom={5}>
+    <Typography> {'  '}</Typography>
+    </Box>
+    <Box>
+<Typography
+  variant='body2'
+  sx={{
+    textAlign: 'center',
+    fontFamily: 'NuevaFuente, sans-serif',
+    fontWeight: 'bold',
+    textTransform: 'capitalize'
+  }}>
+  {users?.name} {users?.lastName}
+  {/* {user?.name} */}
+</Typography>
+<Typography variant='body2' sx={{ textAlign: 'center', fontFamily: 'NuevaFuente, sans-serif' }}>
+  {users?.ci}
+</Typography>
+      </Box>
+
+      </Box>
+
+
+      {/* <Typography style={{  color: 'gray',fontSize:'15px',fontWeight: 'bold'}}>
         NOMBRE: {''}
       </Typography>
 <Typography style={{  color: 'gray',fontSize:'15px'}}>
          {users?.name} {users?.lastName}
-      </Typography>
+      </Typography> */}
 
       <Badge
         overlap='circular'
@@ -134,7 +158,7 @@ const UserDropdown = (props: Props) => {
             <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
               <Typography sx={{ fontWeight: 600 }}> {users?.name} {users?.lastName} </Typography>
               <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
-              {users?.ci}
+              CI: {users?.ci}
               </Typography>
             </Box>
           </Box>
@@ -146,7 +170,7 @@ const UserDropdown = (props: Props) => {
             Profile
           </Box>
         </MenuItem>
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        {/* <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
             <Icon icon='mdi:email-outline' />
             Inbox
@@ -157,7 +181,7 @@ const UserDropdown = (props: Props) => {
             <Icon icon='mdi:message-outline' />
             Chat
           </Box>
-        </MenuItem>
+        </MenuItem> */}
         <Divider />
         <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
@@ -165,25 +189,25 @@ const UserDropdown = (props: Props) => {
             Settings
           </Box>
         </MenuItem>
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        {/* <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
             <Icon icon='mdi:currency-usd' />
             Pricing
           </Box>
-        </MenuItem>
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        </MenuItem> */}
+        {/* <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
             <Icon icon='mdi:help-circle-outline' />
             FAQ
           </Box>
-        </MenuItem>
+        </MenuItem> */}
         <Divider />
         <MenuItem
           onClick={handleLogout}
           sx={{ py: 2, '& svg': { mr: 2, fontSize: '1.375rem', color: 'text.primary' } }}
         >
           <Icon icon='mdi:logout-variant' />
-          Logout
+          Cerrar sesion
         </MenuItem>
       </Menu>
     </Fragment>

@@ -20,31 +20,9 @@ import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-
-import axios from 'axios'
-import {
-  Select,
-  SelectChangeEvent,
-  MenuItem,
-  Card,
-  CardContent,
-  CardHeader,
-  Step,
-  StepContent,
-  StepLabel,
-  Stepper,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-  Grid,
-  CircularProgress,
-  Table
-} from '@mui/material'
 import React from 'react'
-import clsx from 'clsx'
+
 import toast from 'react-hot-toast'
-import StepperWrapper from 'src/@core/styles/mui/stepper'
-import StepperCustomDot from 'src/views/forms/form-wizard/StepperCustomDot'
 import { useAsset } from 'src/context/GruposContabContext'
 
 interface SidebarEditAssetProps {
@@ -54,7 +32,6 @@ interface SidebarEditAssetProps {
 }
 
 interface UserData {
-  _id: string
   assetCategory: string
   usefulLife: number
   subCategory: subCategory
@@ -110,10 +87,8 @@ const SidebarEditContable2: React.FC<SidebarEditAssetProps> = (props) => {
   const { getAsset, updateAsset } = useAsset()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { toggle } = props
-  const [state, setState] = useState<boolean>(false)
   const ContableId = props.ContableId
   const [asset, setAsset] = useState<UserData>({
-    _id: '',
   assetCategory: '',
   usefulLife: 0,
   subCategory: {
@@ -131,16 +106,15 @@ const SidebarEditContable2: React.FC<SidebarEditAssetProps> = (props) => {
       defaultValues,
       mode: 'onChange'
     })
-
+    useEffect(() => {
+      getData()
+    }, [])
     const getData = async () => {
       try {
-        // const response = await axios.get<UserData>(`${process.env.NEXT_PUBLIC_API_ACTIVOS}asset/${providerId}`)
         const res = await getAsset(ContableId)
-        // const responseData = response.data;
         console.log(res)
         setAsset({
           ...asset,
-          _id: res._id,
           assetCategory: res.assetCategory,
           usefulLife: res.usefulLife,
           subCategory: {
@@ -153,10 +127,7 @@ const SidebarEditContable2: React.FC<SidebarEditAssetProps> = (props) => {
         alert(error);
       }
     }
-    useEffect(() => {
-      getData()
 
-    }, [])
     const toggleDrawer = () => {
       setIsDrawerOpen(!isDrawerOpen);
 
@@ -168,7 +139,7 @@ const SidebarEditContable2: React.FC<SidebarEditAssetProps> = (props) => {
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
 
-      if (name.startsWith('informationCountable.')) {
+      if (name.startsWith('subCategory.')) {
         const infoCountableField = name.split('.')[1];
         setAsset((prevAsset) => ({
           ...prevAsset,
@@ -177,63 +148,37 @@ const SidebarEditContable2: React.FC<SidebarEditAssetProps> = (props) => {
             [infoCountableField]: value,
           },
         }));
-      } else if (name.startsWith('assetCategory')) {
-        setAsset((prevAsset) => ({
-          ...prevAsset,
-          assetCategory: value,
-        }));
       } else {
         setAsset((prevAsset) => ({ ...prevAsset, [name]: value }));
       }
     };
-    const [isLoading, setIsLoading] = useState(false);
-    const handleSubmit = async () => {
+
+    const handleSubmit = async (e: FormEvent) => {
+      e.preventDefault();
       try {
-
-        setIsLoading(true);
-
         const assetIds = [...new Set([props.ContableId])].flat();
-        const numericsubCategory = parseFloat(asset.subCategory.subCategory.toString()); // el precio lleva en string convertir a numeric
+        const subCategory = parseFloat(asset.subCategory.subCategory.toString()); // el precio lleva en string convertir a numeric
        const newData = {
           assetIds,
           assetCategory: asset.assetCategory,
           usefulLife: asset.usefulLife,
           subCategory:{
-            subCategory: numericsubCategory,
-
+            subCategory: subCategory,
           }
-
         }
-        await updateAsset(newData);
-
+        await updateAsset(ContableId,newData);
         toggleDrawer();
-        //handleClose();
-
-       const successStyle = {
-         background: 'green', // Color de fondo para éxito
-         color: 'white', // Color del texto para éxito
-       };
-             // Notificación de éxito personalizada
-      toast.success('Activo Editado Correctamente', {
-        style: successStyle, // Aplica el estilo personalizado
-        });
-      // toast.success('Activo Creado');
     } catch (error) {
       console.error(error)
-      toast.error('Hubo un error al Editar el activo');
-    }finally {
-      setIsLoading(false); // Establece isLoading en false después de que se complete la operación
-
     }
   }
   return (
     <>
             <Button
-          variant="outlined" size="small"
-          style={{ color: '#94bb68', borderRadius: '10px',marginRight:'2px',marginTop: '-4px',width: '1px',marginBottom:'10px' }}
+          variant="outlined" size="small" style={{  color:  '#94bb68', borderRadius: '10px',marginRight:'2px' ,marginBottom:'-8px'}}
             onClick={toggleDrawer}
           >
-          <Icon icon='mdi:pencil-outline' fontSize={19} />
+          <Icon icon='mdi:pencil-outline' fontSize={20} />
           </Button>
           <Drawer
           anchor="right"
@@ -266,6 +211,7 @@ const SidebarEditContable2: React.FC<SidebarEditAssetProps> = (props) => {
                       value={asset.assetCategory}
                       id='assetCategory'
                       error={Boolean(errors.assetCategory)}
+                      helperText={errors.assetCategory?.message}
                       onChange={handleChange}
                       autoComplete='off'
                     />
@@ -287,6 +233,7 @@ const SidebarEditContable2: React.FC<SidebarEditAssetProps> = (props) => {
                       value={asset.usefulLife}
                       id='usefulLife'
                       error={Boolean(errors.usefulLife)}
+                      helperText={errors.usefulLife?.message}
                       onChange={handleChange}
                       autoComplete='off'
                     />
@@ -319,7 +266,7 @@ const SidebarEditContable2: React.FC<SidebarEditAssetProps> = (props) => {
               <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }} onClick={ handleSubmit }>
                 Guardar
               </Button>
-              <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>
+              <Button size='large' variant='outlined' color='secondary' onClick={toggleDrawer}>
                 Cancelar
               </Button>
             </Box>

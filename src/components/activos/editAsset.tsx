@@ -82,11 +82,6 @@ interface assetCategory {
   _id: string
   assetCategory: string
 }
-// interface asstResponsible {
-//   _id: string,
-//   fullName: string,
-//   email: string
-// }
 interface assetSupplier {
   _id: string
   managerName: string
@@ -376,14 +371,14 @@ const SidebarEditAsset: React.FC<SidebarEditAssetProps> = (props) => {
 
   const getAssets = async () => {
     try {
-      const response = await axios.get<assetCategory[]>(`${process.env.NEXT_PUBLIC_API_ACTIVOS}depreciation-asset-list`
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_ACTIVOS}depreciation-asset-list`
       , {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       })
-      setGroupContable(response.data)
+      setGroupContable(response.data.depreciationAsset)
     } catch (error) {
       console.error(error)
     }

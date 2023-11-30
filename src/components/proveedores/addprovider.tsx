@@ -98,6 +98,7 @@ const SidebarAddSupplier = (props: SidebarAddUserType) => {
   // ** Props
   const { open, toggle } = props
   const [asset, setAsset] = useState<UserData>({
+
     managerName: '',
     managerCi: '',
     managerPhone: 0,
@@ -618,7 +619,7 @@ export default SidebarAddSupplier
 //   }
 
 //   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-//     setAsset({ ...asset, [e.target.name]: e.target.value })
+//     setAsset({ ...asset, [e.tar  .name]: e.target.value })
 //   }
 
 //   const handleSubmit = async (e: FormEvent) => {

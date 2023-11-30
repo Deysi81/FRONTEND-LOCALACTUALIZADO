@@ -17,9 +17,9 @@ const Home = () => {
   const id = router.query.id
   const token = router.query.token
 
-  if (id && token) {
-    // Redirect(id.toString(), token.toString())
-  }
+  // if (id && token) {
+  //   // Redirect(id.toString(), token.toString())
+  // }
   useEffect(()=>{
     const myArray = [];
     myArray.push("hghj")

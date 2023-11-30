@@ -36,7 +36,7 @@ export async function Redirect(id: string, token: string) {
         localStorage.setItem('token', res.data)
         const tokenExist = localStorage.getItem('token')
         //router.replace('http://10.10.214.219:3050/home/')
-        router.replace('http://localhost:5000/home/')
+        router.replace('http://localhost:5002/home/')
 
         if (!tokenExist) {
           router.push(`${process.env.NEXT_PUBLIC_URL_CENTRAL}/login`)

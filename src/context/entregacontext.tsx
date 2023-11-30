@@ -1,9 +1,11 @@
 import axios from "axios";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
+import toast from "react-hot-toast";
 import { useAuthContext } from "src/context/AuthContext"
 
 interface EntregaContextProps {
   deleteAsset: (id: string) => Promise<void>;
+  handleDeleteConfirmed: (assetIds: string) => Promise<void>;
   getAsset: (id: string) => Promise<Entrega>;
   updateAsset: (item: any) => Promise<void>;
   generatenewPdf: (id:string)=>Promise<void>;
@@ -39,6 +41,7 @@ interface Entrega {
   location: string,
   asset: asets
   pdf:string
+  isDeleted:boolean
 }
 
 
@@ -125,7 +128,7 @@ const AssetEntrega = ({ children }: AssetProviderProps) => {
             }
           })
           await setAsset(res.data.dataArray);
-    await settotalAssets(res.data.totalAsset)
+          await settotalAssets(res.data.totalDelivery)
   }
 
   const deleteAsset = async (id: any) => {
@@ -139,10 +142,35 @@ const AssetEntrega = ({ children }: AssetProviderProps) => {
       if (res.status === 200) {
         setAsset(assets.filter(asset => asset._id !== id));
       }
-    } catch (error:any) {
-      alert(error.response?.data.message)
+      toast.success('ENTREGA ELIMINADO')
+    } catch (error: any) {
+      if (error.response) {
+        // Error in the server response
+        const errorMessage = error.response.data.message || 'Error en el servidor';
+        toast.error(`Hubo un error al eliminar la entrega:\n${errorMessage}`);
+      } else if (error.request) {
+        // Lack of response from the server
+        toast.error('No se recibió respuesta del servidor. Verifica tu conexión a Internet.');
+      } else {
+        // Error in the request
+        toast.error('Error al realizar la solicitud. Por favor, inténtalo de nuevo.');
+      }
     }
-
+  };
+  const handleDeleteConfirmed = async (assetId: string) => {
+    try {
+        const res = await axios.delete(`${process.env.NEXT_PUBLIC_API_ACTIVOS}delivery/${assetId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      if (res.status === 200) {
+        setAsset(assets.filter(asset => asset._id !== assetId));
+      }
+    }catch (error: any) {
+      alert(error.response?.data.message);
+    }
   };
 
 
@@ -221,6 +249,7 @@ console.log([newFields.assetIds])
         totalAssets,
         assets,
         deleteAsset,
+        handleDeleteConfirmed,
         getAsset,
         updateAsset,
         generatenewPdf,

@@ -209,7 +209,7 @@ const AssetProvider = ({ children }: AssetProviderProps) => {
       },
     });
 
-    setStateDB(res.data)
+    setStateDB(res.data.State)
    } catch (error) {
     console.log(error)
    }

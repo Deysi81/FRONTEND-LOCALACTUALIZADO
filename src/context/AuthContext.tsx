@@ -79,7 +79,6 @@ const AuthProvider = ({ children }: Props) => {
     }
 
     const app = id
-
     if (id && token) {
       try {
         const res = await axios.post(`${process.env.NEXT_PUBLIC_URL_API_CENTRAL}`, { app, token },{
@@ -96,8 +95,8 @@ const AuthProvider = ({ children }: Props) => {
           saveSessionInfo(res.data)
       } catch (error:any) {
         alert(error.response.data.message)
-        router.push(`${process.env.NEXT_PUBLIC_URL_CENTRAL}/login`)      }
-
+        router.push(`${process.env.NEXT_PUBLIC_URL_CENTRAL}/login`)
+      }
     }else{
       // console.log(id, token)
       const token = await localStorage.getItem("token")
@@ -124,8 +123,8 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const getUserInfo = async(id:string) => {
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_URL_PERSONAL}api/personal/${id}`)
-    //const res = await axios.get(`http://10.10.214.151:4200/personal}${id}`)
+     const res = await axios.get(`${process.env.NEXT_PUBLIC_URL_PERSONAL}api/personal/${id}`)
+    //const res = await axios.get(`http://10.10.214.225:3110/user/}${id}`)
 
     return res.data
   }

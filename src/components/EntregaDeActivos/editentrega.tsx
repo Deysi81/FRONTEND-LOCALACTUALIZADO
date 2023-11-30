@@ -408,7 +408,7 @@ console.log('ocupados',groupAssetOcup)
 </Grid>
 
 
-            <Grid container>
+            {/* <Grid container>
               <Grid item xs={5} sm={7} lg={7}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <Typography variant='body2' gutterBottom>
@@ -429,13 +429,13 @@ console.log('ocupados',groupAssetOcup)
                   </Select>
                 </FormControl>
               </Grid>
-            </Grid>
+            </Grid> */}
 
 
 
 
             <Grid container>
-              <Grid item xs={5} sm={7} lg={7}>
+              {/* <Grid item xs={5} sm={7} lg={7}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <Typography variant='body2' gutterBottom>
                     Activos Disponibles
@@ -452,11 +452,11 @@ console.log('ocupados',groupAssetOcup)
                     ))}
                   </Select>
                 </FormControl>
-              </Grid>
+              </Grid> */}
 
 
           <Grid container>
-              <Grid item xs={5} sm={7} lg={7}>
+              <Grid item xs={5} sm={9} lg={14}>
               <FormControl fullWidth sx={{ mb: 6 }}>
             <Typography variant='body2' gutterBottom>
                 Observacion
@@ -468,7 +468,7 @@ console.log('ocupados',groupAssetOcup)
                   <>
                      <TextField
                       {...field}
-                      // value={asset.observation}
+                      value={asset.observation}
                       id='observation'
                       error={Boolean(errors.observation)}
                       onChange={handleChange}
@@ -484,7 +484,7 @@ console.log('ocupados',groupAssetOcup)
 </Grid>
 
 
-            <Grid item xs={5} sm={7} lg={7}>
+            {/* <Grid item xs={5} sm={7} lg={7}>
             <FormControl fullWidth sx={{ mb: 6 }}>
             <Typography variant='body2' gutterBottom>
                 Estado
@@ -504,7 +504,7 @@ console.log('ocupados',groupAssetOcup)
                </Select>
                  
              </FormControl>
-            </Grid>
+            </Grid> */}
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }} onClick={handleClose}>

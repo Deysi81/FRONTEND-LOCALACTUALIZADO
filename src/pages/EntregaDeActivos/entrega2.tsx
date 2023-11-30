@@ -14,7 +14,6 @@ import {
   styled,
   tooltipClasses,
   CircularProgress,
-  Checkbox,
   Typography,
   IconButton,
   useTheme,
@@ -28,7 +27,8 @@ import {
   tableCellClasses,
   TablePagination,
   TextField,
-  InputAdornment
+  InputAdornment,
+  DialogActions
 } from '@mui/material'
 
 import SidebarEditEntrega from '../../components/EntregaDeActivos/editentrega';
@@ -65,6 +65,7 @@ interface Delivery {
   location: string,
   asset: asets[]
   pdf:string
+  isDeleted:boolean
   // asset: asets[]
 }
 interface asets {
@@ -98,9 +99,9 @@ const AssetList: React.FC = () => {
   const [open, setOpen] = React.useState(false);
   const { settings } = useSettings()
   const { mode } = settings
-  const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const handleClickOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  //const handleClose = () => setOpen(false)
+  const [deleteAssetId, setDeleteAssetId] = useState<string | null>(null);
 
   const theme = useTheme();
 
@@ -145,12 +146,27 @@ const AssetList: React.FC = () => {
   } = useAsset();
 
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState<boolean>(false)
-  const [userIdToDelete, setUserIdToDelete] = useState<string>('')
   const [isSidebarEditOpen, setIsSidebarEditOpen] = useState(false);
-  const handleDelete = async (id: string) => {
-    // const assetIds = [...new Set([id, ...selectedRows])].flat();
-    setUserIdToDelete(id)
-  }
+  const handleClose = () => {
+    setOpen(false);
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleDeleteCancelled = () => {
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleDelete = (assetId: string) => {
+    setDeleteAssetId(assetId);
+    setIsDeleteConfirmationOpen(true);
+  };
+  const handleDeleteConfirmed = async () => {
+    if (deleteAssetId) {
+      await deleteAsset(deleteAssetId);
+      handleClose();
+      setDeleteAssetId(null);
+    }
+  };
  const generatePdf = async (id:string)=>{
     generatenewPdf(id)
 
@@ -332,6 +348,7 @@ const handlePrint = () => {
             <TableRow sx={{ '& .MuiTableCell-root': { py: (theme: { spacing: (arg0: number) => any; }) => `${theme.spacing(3.9)} !important` } }}>
                 <TableCell style={{fontFamily: 'Roboto, Arial, sans-serif',fontSize: '13px', width: '190px',color:'white' }}>Acciones </TableCell>
                 <TableCell style={headeresti}> </TableCell>
+                <TableCell style={headeresti}sx={{width:'200px'}}>Estado</TableCell>
                 <TableCell style={headeresti}sx={{width:'200px'}}>Usuario que entrega</TableCell>
                 <TableCell style={headeresti}sx={{width:'200px'}}>Usuario que recibe </TableCell>
                 <TableCell style={headeresti}sx={{width:'200px'}}>Ubicacion </TableCell>
@@ -339,10 +356,12 @@ const handlePrint = () => {
                 <TableCell style={{fontFamily: 'Roboto, Arial, sans-serif', fontSize: '13px',color:'white'}}>Actas </TableCell>
             </TableRow>
           </TableHead>
+
 {/* //FILTROS */}
           <TableHead  style={headersty}>
             <TableRow sx={{ '& .MuiTableCell-root': { py: (theme: { spacing: (arg0: number) => any; }) => `${theme.spacing(2.9)} !important` } }}>
                 <TableCell> </TableCell>
+                <TableCell > </TableCell>
                 <TableCell > </TableCell>
                 <TableCell >
                 <TextField
@@ -496,6 +515,7 @@ const handlePrint = () => {
                   </ul>
 
                 </TableCell>
+                <TableCell style={bodystyle}>{asset.isDeleted}</TableCell>
                 <TableCell style={bodystyle}>{asset.transmitter}</TableCell>
                 <TableCell style={bodystyle}>{asset.receiver} </TableCell>
                 <TableCell style={bodystyle}>{asset.location} </TableCell>
@@ -572,9 +592,24 @@ const handlePrint = () => {
               </TableCell>
             </TableRow>
           </TableBody>
-          )
+          )}
+                <Dialog open={isDeleteConfirmationOpen} onClose={handleClose}>
+                  <DialogTitle>Confirmar eliminación</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      ¿Estás seguro que deseas eliminar esta Entrega
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleDeleteCancelled} color="primary">
+                      Cancelar
+                    </Button>
+                    <Button onClick={handleDeleteConfirmed} color="primary">
+                      Eliminar
+                    </Button>
+                  </DialogActions>
+                </Dialog>
 
-          }
         </Table>
       </TableContainer>
       <TablePagination
